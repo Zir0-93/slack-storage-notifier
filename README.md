@@ -1,5 +1,5 @@
 # slack-storage-notifier
-Monitor Disk Storage Using A Slack App.
+A Slack App that monitors disk storage levels.
 
 ![image](notification.png)
 
