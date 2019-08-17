@@ -12,7 +12,6 @@ if [[ $webhook_url == "" ]]; then
         fi
 fi
 # ------------
-# Rea
 shift
 channel=$1
 if [[ $channel == "" ]]; then
@@ -42,9 +41,9 @@ do
                 json+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"pretext\":\"$pretext\", \"color\":\"#0080ff\"},"
         else
                 # Check the returned 'used' column to determine color
-                if [[ ${words[4]} == 9* ]] || [[ ${words[4]} == 100* ]]; then
+                if [[ ${words[4]} > 89 ]]; then
                         color="danger"
-                elif [[ ${words[4]} == 7* ]] || [[ ${words[4]} == 8* ]]; then
+                elif [[ ${words[4]} > 60 ]]; then
                         color="warning"
                 else
                         color="good"
@@ -52,6 +51,7 @@ do
                 json+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"color\":\"$color\"},"
         fi
 done
+
 # trim trailing comma
 json="${json::-1}"
 # -----------
