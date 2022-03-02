@@ -1,0 +1,4 @@
+# ディスク容量監視
+HOSTNAME="【◯△□様】https://xxxxx.xx/ WEB1"
+SLACK_WEBHOOK_URL=<webhook_url>
+0 * * * * sh slack-storage-notifier/slack_storage_notifier.sh

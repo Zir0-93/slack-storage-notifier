@@ -1,4 +1,0 @@
-# ディスク容量監視
-HOSTNAME="【テスト商事】testシステム-DB"
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/xxxxxxxxxxxxxxxxxxxxxxx
-0 * * * * sh slack-storage-notifier/slack_storage_notifier.sh
