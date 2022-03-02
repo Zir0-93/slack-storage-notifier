@@ -20,7 +20,7 @@ git version 1.8.3.1
 $ cd ~
 $ git clone https://github.com/kak1/slack-storage-notifier.git
 ```
-※ 1でgitをインストールできなかった場合は、ローカル環境でgitクローンしてホームディレクトリにslack-storage-notifierディレクトリごとアップロードする。
+※ 1.でgitをインストールできなかった場合は、ローカル環境でgitクローンしたslack-storage-notifierディレクトリを監視対象サーバのホームディレクトリにアップロードする。
 
 ### 3. cronの設定追加
 監視対象サーバにて下記内容をcrontabファイルに追加する。
