@@ -23,7 +23,7 @@ fi
 # ------------
 # Execute df-h
 text="$(df -h)"
-pretext="Summary of available disk storage space on *$hostname*."
+pretext=" *$hostname* サーバのディスク容量が危険です。"
 # ------------
 # Generate the JSON payload to POST to slack
 json="{"
@@ -31,6 +31,7 @@ if [[ $channel != "" ]]; then
         json+="\"channel\": \"$channel\","
 fi
 json+="\"attachments\":["
+disks=""
 IFS=$'\n'
 for textLine in $text
 do
@@ -38,23 +39,30 @@ do
         words=($textLine)
         if [[ ${words[0]} == "Filesystem" ]]; then
                 # This is the header line of df- h command
-                json+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"pretext\":\"$pretext\", \"color\":\"#0080ff\"},"
+                json+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"pretext\":\"$pretext\", \"color\":\"#ffffff\"},"
         else
                 # Check the returned 'used' column to determine color
-                if [[ ${words[4]} > 89 ]]; then
+                used=${words[4]}
+                used=${used%\%}
+                if (( $used > 89 )); then
                         color="danger"
-                elif [[ ${words[4]} > 60 ]]; then
+                elif (( $used > 79 )); then
                         color="warning"
                 else
-                        color="good"
+                        #color="good"
+                        continue
                 fi
-                json+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"color\":\"$color\"},"
+                disks+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"color\":\"$color\"},"
         fi
 done
 
+if [[ $disks == "" ]]; then
+        exit
+fi
+
 # trim trailing comma
-json="${json::-1}"
+disks="${disks::${#disks}-1}"
 # -----------
 # Complete JSON payload and make API request
-json+="]}"
+json+="$disks]}"
 curl -s -d "payload=$json" "$webhook_url"
