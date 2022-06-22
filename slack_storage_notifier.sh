@@ -1,5 +1,6 @@
 #!/bin/bash
 # ------------
+# Read HOSTNAME
 hostname=${HOSTNAME}
 # ------------
 # Read webhook URL param
@@ -7,38 +8,26 @@ webhook_url=$1
 if [[ $webhook_url == "" ]]; then
         webhook_url=${SLACK_WEBHOOK_URL}
         if [[ $webhook_url == "" ]]; then
-                echo "No webhook_url specified"
+                echo "No webhook_url specified" >&2
                 exit 1
-        fi
-fi
-# ------------
-shift
-channel=$1
-if [[ $channel == "" ]]; then
-        channel=${SLACK_CHANNEL}
-        if [[ $channel == "" ]]; then
-                echo "No channel specified, posting to default channel."
         fi
 fi
 # ------------
 # Execute df-h
 text="$(df -h)"
-pretext=" *$hostname* サーバのディスク容量が危険です。"
 # ------------
 # Generate the JSON payload to POST to slack
-json="{"
-if [[ $channel != "" ]]; then
-        json+="\"channel\": \"$channel\","
-fi
-json+="\"attachments\":["
+json="{\"attachments\":["
 disks=""
 IFS=$'\n'
+i=0
 for textLine in $text
 do
         IFS=$' '
         words=($textLine)
-        if [[ ${words[0]} == "Filesystem" ]]; then
+        if [[ $i -eq 0 ]]; then
                 # This is the header line of df- h command
+                pretext=" *$hostname* サーバのディスク容量不足"
                 json+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"pretext\":\"$pretext\", \"color\":\"#ffffff\"},"
         else
                 # Check the returned 'used' column to determine color
@@ -46,14 +35,13 @@ do
                 used=${used%\%}
                 if (( $used > 89 )); then
                         color="danger"
+                        disks+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"color\":\"$color\"},"
                 elif (( $used > 79 )); then
                         color="warning"
-                else
-                        #color="good"
-                        continue
+                        disks+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"color\":\"$color\"},"
                 fi
-                disks+="{\"text\": \"\`\`\`\n$textLine\n\`\`\`\", \"color\":\"$color\"},"
         fi
+        i=`expr $i + 1`
 done
 
 if [[ $disks == "" ]]; then
