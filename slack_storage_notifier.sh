@@ -13,11 +13,24 @@ if [[ $webhook_url == "" ]]; then
         fi
 fi
 # ------------
+shift
+channel=$1
+if [[ $channel == "" ]]; then
+        channel=${SLACK_CHANNEL}
+        if [[ $channel == "" ]]; then
+                echo "No channel specified, posting to default channel."
+        fi
+fi
+# ------------
 # Execute df-h
 text="$(df -h)"
 # ------------
 # Generate the JSON payload to POST to slack
-json="{\"attachments\":["
+json="{"
+if [[ $channel != "" ]]; then
+        json+="\"channel\": \"$channel\","
+fi
+json+="\"attachments\":["
 disks=""
 IFS=$'\n'
 i=0
